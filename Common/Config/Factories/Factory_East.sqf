@@ -26,7 +26,7 @@ missionNamespace setVariable [format["CTI_%1_Vehicles_Startup", _side], [
 		["Toolkit", 4],
 		["B_FieldPack_ocamo", 4]
 	]],
-	["O_MRAP_02_F", [	
+	["O_MRAP_02_F", [
 		["firstaidkit", 10],
 		["30Rnd_556x45_Stanag", 15],
 		["launch_RPG32_F", 5], ["RPG32_F", 10],
@@ -139,12 +139,11 @@ _u = _u		+ ['O_T_VTOL_02_vehicle_F'];
 _u = _u		+ ['O_UAV_02_CAS_F'];
 _u = _u		+ ['O_UAV_02_F'];
 _u = _u		+ ['O_T_UAV_04_CAS_F'];
-_u = _u		+ ['O_Plane_CAS_02_F'];
+_u = _u		+ ['O_Plane_CAS_02_dynamicLoadout_F'];
 _u = _u		+ ['I_Heli_light_03_unarmed_F'];
 _u = _u		+ ['I_Heli_light_03_F'];
 _u = _u		+ ['I_Heli_Transport_02_F'];
-_u = _u		+ ['I_Plane_Fighter_03_CAS_F'];
-_u = _u		+ ['I_Plane_Fighter_03_AA_F'];
+_u = _u		+ ['I_Plane_Fighter_03_dynamicLoadout_F'];
 _u = _u		+ ['Land_Pod_Heli_Transport_04_medevac_F'];
 _u = _u		+ ['Land_Pod_Heli_Transport_04_covered_F'];
 _u = _u		+ ['Land_Pod_Heli_Transport_04_bench_F'];
