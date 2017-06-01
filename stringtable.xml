@@ -37,6 +37,10 @@
 				<Original>Special Vehicles</Original>
 				<Russian>Специальные машины</Russian>
 			</Key>
+			<Key ID="STR_Icon_Airmenu">
+				<Original>Air Service Menu</Original>
+				<Russian>Air Service Menu</Russian>
+			</Key>
 			<Key ID="STR_Com">
 				<Original>Commander</Original>
 				<Russian>Командир</Russian>

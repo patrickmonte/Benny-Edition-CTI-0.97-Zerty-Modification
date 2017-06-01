@@ -8,6 +8,8 @@
 class GOM_dialog_aircraftLoadout {
 idd = 66;
 movingEnable = 0;
+onLoad = "uiNamespace setVariable ['cti_dialog_GOM_dialog_aircraftLoadout', _this select 0];";
+onUnload = "uiNamespace setVariable ['cti_dialog_GOM_dialog_aircraftLoadout', nil];";
 class controls {
 ////////////////////////////////////////////////////////
 // GUI EDITOR OUTPUT START (by Grumpy Old Man, v1.063, #Vajire)
@@ -39,7 +41,7 @@ class RscStructuredText_1101: RscStructuredText
 			sizeEx = 0.03;
 
 };
-class RscListbox_1500: RscListBox
+class RscListbox_1500: RscListBoxGOM
 {
 	idc = 1500;
 
@@ -49,7 +51,7 @@ class RscListbox_1500: RscListBox
 	h = 12 * GUI_GRID_H;
 	sizeEx = 0.03;
 };
-class RscListbox_1501: RscListBox
+class RscListbox_1501: RscListBoxGOM
 {
 	idc = 1501;
 
@@ -60,7 +62,7 @@ class RscListbox_1501: RscListBox
 		sizeEx = 0.03;
 
 };
-class RscListbox_1502: RscListBox
+class RscListbox_1502: RscListBoxGOM
 {
 	idc = 1502;
 

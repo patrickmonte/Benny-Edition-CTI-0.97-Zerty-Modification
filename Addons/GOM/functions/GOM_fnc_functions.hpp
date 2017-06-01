@@ -1,13 +1,12 @@
-class CfgFunctions
+class GOM
 {
 
-	class GOM
+	class init
+
 	{
 
-		class dialog
+		class aircraftLoadoutInit{file = "Addons\GOM\functions\GOM_fnc_aircraftLoadoutInit.sqf";preInit = 1;};
 
-		{
-			class aircraftLoadoutInit{file = "scripts\GOM\functions\GOM_fnc_aircraftLoadoutInit.sqf";preInit = 1;};
-		};
 	};
+
 };

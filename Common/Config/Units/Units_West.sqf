@@ -684,7 +684,7 @@ _u = _u + [1];
 _f = _f + [CTI_FACTORY_AIR];
 _s = _s + [""];
 
-_c = _c + ['B_Plane_CAS_01_F'];
+_c = _c + ['B_Plane_CAS_01_dynamicLoadout_F'];
 _p = _p + [''];
 _n = _n + [''];
 _o = _o + [40000];
@@ -841,7 +841,7 @@ _u = _u + [4];
 _f = _f + [4];
 _s = _s + [""];
 
-_c = _c + ['I_Plane_Fighter_03_CAS_F'];
+_c = _c + ['I_Plane_Fighter_03_dynamicLoadout_F'];
 _p = _p + [''];
 _n = _n + [''];
 _o = _o + [35000];
@@ -850,14 +850,6 @@ _u = _u + [5];
 _f = _f + [4];
 _s = _s + [""];
 
-_c = _c + ['I_Plane_Fighter_03_AA_F'];
-_p = _p + [''];
-_n = _n + [''];
-_o = _o + [35000];
-_t = _t + [40];
-_u = _u + [5];
-_f = _f + [4];
-_s = _s + [""];
 
 
 _c = _c + ['Box_NATO_Wps_F'];

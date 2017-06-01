@@ -2,8 +2,13 @@
 // feel free to use as you like, as long as I'm credited as the original author
 createdialog "GOM_dialog_setPylonLoadout";
 playSound "Click";
-_vehicles = (getposasl player nearentities ["Air", 130])select {!isEngineOn _x};
-player setVariable ["GOM_fnc_setPylonLoadoutVehicles", _vehicles];
+
+//mod CTI
+
+//_vehicles = (getposasl player nearentities ["Air", 130])select {!isEngineOn _x};
+//player setVariable ["GOM_fnc_setPylonLoadoutVehicles", _vehicles];
+
+//
 
 lbclear 1500;
 lbclear 1501;
@@ -67,10 +72,13 @@ GOM_fnc_setPylonLoadoutLBPylonsUpdate = {
 		lbAdd [1501, format ["Pylon %1", _foreachindex + 1]];
 	} forEach _activePylonMags;
 	_allPylonMagazines	    = "toUpper (configname _x) find 'PYLON' >= 0" configClasses (configfile >> "CfgMagazines");
+
+	//TD : Filter with upgrades ++ add price
+
 	_allPylonMagazinesDispNames = _allPylonMagazines apply {getText (configfile >> "CfgMagazines" >> configName _x >> "displayName")};
 	lbClear 1502;
 	{
-
+		// + price
 		lbAdd [1502, _x];
 	} forEach _allPylonMagazinesDispNames;
 	_updateText = [] call GOM_fnc_pylonCurrentSetup;
@@ -116,6 +124,15 @@ GOM_fnc_pylonInstallWeapon = {
 	_pylonNum = lbCurSel 1501;
 	systemchat format ["Installed %1 %2 on pylon %3", _finalAmount, _magDispName, _pylonNum];
 
+	// verify upgrade
+
+
+	// verify funds
+
+
+	if (! local _veh) exitWith {systemchat "Error: Vehicle not local, please get in"};// verify local
+
+
 	_veh setPylonLoadOut [_pylonNum, "", true];
 	_veh setPylonLoadOut [_pylonNum, _mag, true];
 	_veh SetAmmoOnPylon [_pylonNum, _finalAmount];
@@ -147,6 +164,13 @@ GOM_fnc_setPylonsRearm = {
 	_veh		 = _vehicles select lbcursel 1500;
 	_activePylonMags = GetPylonMagazines _veh;
 
+	//check upgrades
+
+	//check funds
+
+	if (! local _veh) exitWith {systemchat "Error: Vehicle not local, please get in"};//check local
+
+
 	{
 
 		_maxAmount = getNumber (configfile >> "CfgMagazines" >> _x >> "count");
@@ -154,6 +178,9 @@ GOM_fnc_setPylonsRearm = {
 	} forEach _activePylonMags;
 	playSound "Click";
 	systemchat "Vehicle pylons rearmed!";
+
+	// remove funds
+
 	[_veh, selectRandom ['FD_Target_PopDown_Large_F', 'FD_Target_PopDown_Small_F', 'FD_Target_PopUp_Small_F']] remoteExec ["say", 0];
 };
 
@@ -162,9 +189,12 @@ GOM_fnc_setPylonsRepair = {
 	if (lbCursel 1500 < 0) exitWith {systemchat "Select a vehicle first."};
 	_vehicles = player getVariable ["GOM_fnc_setPylonLoadoutVehicles", []];
 	_veh	  = _vehicles select lbcursel 1500;
-	_veh setDamage 0;
+
+	// swich to CTI repair system
+
+	/*_veh setDamage 0;
 	playSound "Click";
-	systemchat "Vehicle repaired!";
+	systemchat "Vehicle repaired!";*/
 	[_veh, selectRandom ['FD_Target_PopDown_Large_F', 'FD_Target_PopDown_Small_F', 'FD_Target_PopUp_Small_F']] remoteExec ["say", 0];
 };
 
@@ -173,11 +203,15 @@ GOM_fnc_setPylonsRefuel = {
 	if (lbCursel 1500 < 0) exitWith {systemchat "Select a vehicle first."};
 	_vehicles = player getVariable ["GOM_fnc_setPylonLoadoutVehicles", []];
 	_veh	  = _vehicles select lbcursel 1500;
-	playSound "Click";
+
+	// swich to CTI refuel system
+
+	/*playSound "Click";
 	systemchat "Vehicle refueled!";
+	_veh setFuel 1;
+	*/
 	[_veh, selectRandom ['FD_Target_PopDown_Large_F', 'FD_Target_PopDown_Small_F', 'FD_Target_PopUp_Small_F']] remoteExec ["say", 0];
 
-	_veh setFuel 1;
 };
 
 finddisplay 66 displayCtrl 1500 ctrlAddEventHandler ["LBSelChanged", "[] call GOM_fnc_setPylonLoadoutLBPylonsUpdate"];

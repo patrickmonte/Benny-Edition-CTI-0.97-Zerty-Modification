@@ -495,7 +495,7 @@ class RscCombo
 		1
 	};
 };
-class RscListBox
+class RscListBoxGOM
 {
 	deletable = 0;
 	fade = 0;

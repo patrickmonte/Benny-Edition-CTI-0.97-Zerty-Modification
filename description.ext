@@ -13,6 +13,10 @@
 
 #include "Addons\Strat_mode\res.hpp"
 
+//#include "Addons\GOM\functions\GOM_fnc_functions.hpp"
+//#include "Addons\GOM\dialogs\GOM_dialog_parents.hpp"
+#include "Addons\GOM\dialogs\GOM_dialog_controls.hpp"
+
 loadScreen = "banner.jpg";
 // ^HS^ for Headless Client
 joinUnassigned = 0;

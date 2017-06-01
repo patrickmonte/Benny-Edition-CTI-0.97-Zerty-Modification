@@ -450,6 +450,8 @@ if (CTI_IsClient) then {
 		["darter","onEachFrame",{0 call UAV_RANGE } ] call BIS_fnc_addStackedEventHandler;
 	};
 
+  // GOM air loadout
+ 0 execvm "Addons\GOM\functions\GOM_fnc_aircraftLoadoutInit.sqf";
 
 };
 

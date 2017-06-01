@@ -7,40 +7,11 @@ _add = [this] call GOM_fnc_addAircraftLoadout
 to have a player inside the jet be able to use it put this in the pilots init field:
 _add = [vehicle player,"PILOT"] call GOM_fnc_addAircraftLoadout
 should work on dedi and MP
-Changelog:
-V1.2
-Added button to select who has control over the pylon (pilot or gunner)
-Added customer presets saved individually for each vehicle for every player
- -Presets will be saved for each vehicle type, so you can equip multiple aircraft with the same loadout within a few clicks
- -Presets will contain the pylon loadout, ammo amount from each pylon, respective pylon owners (pilot, gunner) and the livery of the aircraft
- -Presets are stored in profileNamespace, so they'll persist everytime you use this loadout menu, no matter which server you're on
- -Delete button is locked by default, can only be used when holding CTRL to prevent mishaps
-Added livery option, will change texture if the aircraft has any in the config
-Added option to override the pylon compatibility check, yay 120 DAGR wipeout
-Added option to make the presence of ammo/fuel/repair supplies necessary, no ammotruck? no fancy weapons!
-Added duration to rearming an aircraft, fully rearming an empty 120 DAGR wipeout can take up to 2 minutes
-Added duration to repairing an aircraft, default is set to 60s from 0 to 100% health
- -repair speed can be adjusted
-Added duration to refuelling an aircraft, fillrate is set to 1800l/min as default and will be calculated accordingly (wipeout with 1000l fuel capacity will take 33s to refill to 100%)
- -refill rate can be adjusted
- -refuelling will abort when the aircraft is not stationary
- -you can only simultaneously refuel as much airplanes as you have fuel sources
-Fixed 'clear all pylons' button now to properly remove all leftover weapon classes from the aircraft
-Fixed 'rearm' button now to properly rearm all weapons, on board cannons, flare/chaff launchers
-
-
-V1.1
-Added compatibility check for magazines and pylons, so you can't add everything on every pylon.
-Installing a pylon takes some time.
-Added possibility to execute this for one pilot in a stationary aircraft or as an action from an ammo truck or whatever you'd like.
-Added options for reporting and receiving of remote targets as well as reporting the aircrafts own position.
-The 'clear all pylong' button now properly removes all pylons, no more leftovers
-
 */
 
-GOM_fnc_aircraftLoadout_NeedsFuelSource = true; //(default: true) needs fuel supply within 50m of the aircraft or functions will be unavailable
-GOM_fnc_aircraftLoadout_NeedsAmmoSource = true; //(default: true) needs ammo supply within 50m of the aircraft or functions will be unavailable
-GOM_fnc_aircraftLoadout_NeedsRepairSource = true; //(default: true) needs repair supply within 50m of the aircraft or functions will be unavailable
+GOM_fnc_aircraftLoadout_NeedsFuelSource = false; //(default: true) needs fuel supply within 50m of the aircraft or functions will be unavailable
+GOM_fnc_aircraftLoadout_NeedsAmmoSource = false; //(default: true) needs ammo supply within 50m of the aircraft or functions will be unavailable
+GOM_fnc_aircraftLoadout_NeedsRepairSource = false; //(default: true) needs repair supply within 50m of the aircraft or functions will be unavailable
 
 
 GOM_fnc_allowAllPylons = false; //(default: false) removes check that only allows compatible pylons to be mounted
@@ -81,10 +52,34 @@ GOM_fnc_updateDialog = {
 	_flags params ["_canRefuel","_canRepair","_canRearm"];
 	_vehs params ["_refuelVehs","_repairVehs","_rearmVehs"];
 
-	_availableTexts = ["Not available","Available"];
+	_availableTexts = ["<t color='#E51B1B'>Not available!</t>","<t color='#1BE521'>Available!</t>"];
 
 
-	_text = format ["<t align='center'>Repairing: %1!<br />Refueling: %2!<br />Rearming: %3!",(_availableTexts select _canRepair),(_availableTexts select _canRefuel),(_availableTexts select _canRearm)];
+	_fueltext = if (GOM_fnc_aircraftLoadout_NeedsFuelSource AND !_canRefuel) then {"You need fuel sources to refuel the aircraft."} else {""};
+	_repairtext = if (GOM_fnc_aircraftLoadout_NeedsRepairSource AND !_canRepair) then {"You need repair sources to repair the aircraft."} else {""};
+	_rearmtext = if (GOM_fnc_aircraftLoadout_NeedsAmmoSource AND !_canRearm) then {"You need ammo sources to rearm the aircraft."} else {""};
+
+	if (GOM_fnc_aircraftLoadout_NeedsFuelSource AND _canRefuel) then {
+		_t = "";
+_getText = (_refuelVehs call BIS_fnc_consolidateArray) apply {_t = (_t + " " + str (_x select 1) + " " + (getText (configfile >> "CfgVehicles" >> typeof (_x select 0) >> "displayName")) + ",")};
+		_fueltext = format ["%1 fuel sources nearby:%2",count _refuelVehs,_t select [0,((count _t) -1)]];
+
+	};
+	if (GOM_fnc_aircraftLoadout_NeedsRepairSource AND _canRepair) then {
+		_t = "";
+_getText = (_repairVehs call BIS_fnc_consolidateArray) apply {_t = (_t + " " + str (_x select 1) + " " + (getText (configfile >> "CfgVehicles" >> typeof (_x select 0) >> "displayName")) + ",")};
+		_repairtext = format ["%1 repair sources nearby:%2",count _repairVehs,_t select [0,((count _t) -1)]]
+
+	};
+	if (GOM_fnc_aircraftLoadout_NeedsAmmoSource AND _canRearm) then {
+		_t = "";
+	_getText = (_rearmVehs call BIS_fnc_consolidateArray) apply {_t = (_t + " " + str (_x select 1) + " " + (getText (configfile >> "CfgVehicles" >> typeof (_x select 0) >> "displayName")) + ",")};
+		_rearmtext = format ["%1 ammo sources nearby:%2",count _rearmVehs,_t select [0,((count _t) -1)]]
+
+	};
+
+
+	_text = format ["<t shadow='2'><t align='center'>Repairing: %1<br />Refueling: %2<br />Rearming: %3<br /><t align='left'>%4<br />%5<br />%6",(_availableTexts select _canRepair),(_availableTexts select _canRefuel),(_availableTexts select _canRearm),_repairtext,_fueltext,_rearmtext];
 
 	(finddisplay 66 displayctrl 1100) ctrlSetStructuredText parsetext _text;
 
@@ -124,7 +119,6 @@ GOM_fnc_updateDialog = {
 		_pylonInfoText = _pylonInfoText + format ["%1Pylon %2: %3 - %4 (%5).%6",_setAlign,_count,_owner,_pylonDispname,_pylonAmmoCounts select _forEachIndex,_break];
 
 	} forEach _pylons;
-
 			_text = format ["<t align='center'>Selected %1 preset: %2<br /><br /><t align='left' t size='0.75'>Livery: %3<br />%4",_dispName,_presetName,_textureName,_pylonInfoText];
 
 	(finddisplay 66 displayctrl 1100) ctrlSetStructuredText parsetext _text;
@@ -166,12 +160,14 @@ GOM_fnc_updateDialog = {
 
 	_integrity = [((damage _veh * 100) - 100) * -1] call GOM_fnc_roundByDecimals;
 
+	_pylontext = format ["Mount %1 on %2 - %3<br />",_pylonMagDispName,_pyl,_ownertext];
+		if (lbcursel 1502 < 0) then {_pylontext = ""};
 
 
-	_text = format ["<t align='center'>%1, Integrity: %11%12<br />Pilot: %2 %3<br />Fuel: %4l / %5l<br />Mount %6 on %7<br />%8",_dispName,_rank,_driverName,_fuel,_maxFuel,_pylonMagDispName,_pyl,_ownerText,_integrity,"%"];
+	_text = format ["<t align='center'>%1, Integrity: %2%3<br />Pilot: %4 %5<br />Fuel: %6l / %7l<br />%8",_dispName,_integrity,"%",_rank,_driverName,_fuel,_maxFuel,_pylontext];
 
 	(finddisplay 66 displayctrl 1100) ctrlSetStructuredText parsetext _text;
-
+true
 };
 
 GOM_fnc_setPylonLoadoutLBPylonsUpdate = {
@@ -206,7 +202,7 @@ GOM_fnc_setPylonLoadoutLBPylonsUpdate = {
 	findDisplay 66 displayCtrl 2802 cbSetChecked (vehicleReportOwnPosition _veh);
 
 	playSound "Click";
-
+true
 };
 
 GOM_fnc_setPylonLoadoutLBMagazinesCountUpdate = {
@@ -221,7 +217,7 @@ GOM_fnc_setPylonLoadoutLBMagazinesCountUpdate = {
 
 	ctrlSetText [1400,str _count];
 	playSound "Click";
-
+true
 };
 
 GOM_fnc_pylonInstallWeapon = {
@@ -254,7 +250,7 @@ GOM_fnc_pylonInstallWeapon = {
 
 
 	playSound "Click";
-
+true
 };
 GOM_fnc_installPylons = {
 
@@ -305,6 +301,7 @@ sleep random [0.5,1,2.5];
 	_veh setVariable ["GOM_fnc_airCraftLoadoutPylonInstall",_checkOut,true];
 
 	systemchat format ["Successfully installed %1 %2 on %3!",_finalAmount,_magDispName,_pylonName];
+	true
 };
 
 GOM_fnc_clearAllPylons = {
@@ -333,7 +330,7 @@ GOM_fnc_clearAllPylons = {
 
 	_sound = [_veh] call GOM_fnc_pylonSound;
 	systemchat "All pylons cleared!";
-
+true
 };
 
 GOM_fnc_aircraftLoadoutClear = {
@@ -350,7 +347,7 @@ GOM_fnc_aircraftLoadoutClear = {
 	_pylonWeapons = [];
 	{ _pylonWeapons append getArray (_x >> "weapons") } forEach ([_veh, configNull] call BIS_fnc_getTurrets);
 	{ _veh removeWeaponGlobal _x } forEach ((weapons _veh) - _pylonWeapons);
-
+true
 };
 
 GOM_fnc_setPylonsRearm = {
@@ -360,8 +357,25 @@ _nul = [_obj,_rearm,_pylons,_pylonAmmoCounts] spawn {
 
 	params ["_obj",["_rearm",false],["_pylons",[]],["_pylonAmmoCounts",[]]];
 
-	if (lbCursel 1500 < 0) exitWith {systemchat "Select an aircraft first.
-"};
+	_notbusy = [];
+	_ammosource = objnull;
+	if (GOM_fnc_aircraftLoadout_NeedsAmmoSource) then {
+	_ammoVehs = vehicles select {typeof _x isKindOf "All" AND {_x distance2d _obj <= 50} AND {speed _x < 1} AND {alive _x} AND {getNumber (configfile >> "CfgVehicles" >> typeof _x >> "transportAmmo") > 0}};
+	if (_ammoVehs isEqualTo []) exitWith {systemchat "You have no valid ammo sources!"};
+
+
+		_notBusy = _ammoVehs select {!(_x getVariable ["GOM_fnc_aircraftLoadoutBusyAmmoSource",false])};
+
+		if (_notBusy isEqualTo []) exitWith {systemchat "All repair sources are currently busy!"};
+		_ammosource = _notBusy select 0;
+
+		_ammosource setVariable ["GOM_fnc_aircraftLoadoutBusyAmmoSource",true,true];
+
+	};
+
+
+
+	if (lbCursel 1500 < 0) exitWith {systemchat "Select an aircraft first."};
 	_vehicles = _obj getVariable ["GOM_fnc_setPylonLoadoutVehicles",[]];
 	_veh = _vehicles select lbcursel 1500;	_veh setVehicleAmmo 1;
 
@@ -400,6 +414,8 @@ _nul = [_obj,_rearm,_pylons,_pylonAmmoCounts] spawn {
 
 	} forEach _pylons;
 	playSound "Click";
+	_ammosource setVariable ["GOM_fnc_aircraftLoadoutBusyAmmoSource",false,true];
+
 	_veh setVariable ["GOM_fnc_aircraftLoadoutRearmingInProgress",false,true];
 	systemchat "All pylons and board guns rearmed!";
 };
@@ -435,6 +451,8 @@ _nul = [_obj,_rearm,_pylons,_pylonAmmoCounts] spawn {
 	} forEach _activePylonMags;
 	playSound "Click";
 	_veh setVariable ["GOM_fnc_aircraftLoadoutRearmingInProgress",false,true];
+		_ammosource setVariable ["GOM_fnc_aircraftLoadoutBusyAmmoSource",false,true];
+
 	systemchat "All pylons and board guns rearmed!";
 
 };
@@ -449,12 +467,20 @@ GOM_fnc_setPylonsRepair = {
 "};
 
 	_repairVehs = vehicles select {typeof _x isKindOf "All" AND {_x distance2d _obj <= 50} AND {speed _x < 1} AND {alive _x} AND {getNumber (configfile >> "CfgVehicles" >> typeof _x >> "transportRepair") > 0}};
-	if (_repairVehs isEqualTo []) exitWith {systemchat "You have no valid repair sources!"};
-	_notBusy = _repairVehs select {!(_x getVariable ["GOM_fnc_aircraftLoadoutBusyRepairSource",false])};
-	if (_notBusy isEqualTo []) exitWith {systemchat "All repair sources are currently busy!"};
-	_repairSource = _notBusy select 0;
+	if (_repairVehs isEqualTo [] AND GOM_fnc_aircraftLoadout_NeedsRepairSource) exitWith {systemchat "You have no valid repair sources!"};
+	_notbusy = [];
+	_repairsource = objnull;
+	if (GOM_fnc_aircraftLoadout_NeedsRepairSource) then {
 
-	_repairSource setVariable ["GOM_fnc_aircraftLoadoutBusyRepairSource",true,true];
+
+		_notBusy = _repairVehs select {!(_x getVariable ["GOM_fnc_aircraftLoadoutBusyRepairSource",false])};
+
+		if (_notBusy isEqualTo []) exitWith {systemchat "All repair sources are currently busy!"};
+		_repairSource = _notBusy select 0;
+
+		_repairSource setVariable ["GOM_fnc_aircraftLoadoutBusyRepairSource",true,true];
+
+	};
 	_vehicles = _obj getVariable ["GOM_fnc_setPylonLoadoutVehicles",[]];
 	_veh = _vehicles select lbcursel 1500;
 
@@ -465,6 +491,7 @@ GOM_fnc_setPylonsRepair = {
 		if (_curDamage isEqualTo 1) exitWith {systemchat "Aircraft is destroyed!"};
 
 		_sourceDispname = getText (configfile >> "CfgVehicles" >> typeof _repairSource >> "displayName");
+
 		_vehDispName = getText (configfile >> "CfgVehicles" >> typeof _veh >> "displayName");
 
 			_repairTick = (1 / GOM_fnc_aircraftLoadoutRepairTime);
@@ -491,6 +518,7 @@ GOM_fnc_setPylonsRepair = {
 
 		};
 		_veh setdamage 0;
+
 	_repairSource setVariable ["GOM_fnc_aircraftLoadoutBusyRepairSource",false,true];
 	systemchat format ["%1 repaired: %2%3!",_vehDispName,_damDisp,"%"];
 		playSound "Click";
@@ -498,7 +526,7 @@ GOM_fnc_setPylonsRepair = {
 
 	playSound "Click";
 
-
+true
 };
 
 GOM_fnc_setPylonsRefuel = {
@@ -508,12 +536,15 @@ GOM_fnc_setPylonsRefuel = {
 	if (lbCursel 1500 < 0) exitWith {systemchat "Select an aircraft first.
 "};
 	_refuelVehs = vehicles select {typeof _x isKindOf "All" AND {_x distance2d _obj <= 50} AND {speed _x < 1} AND {alive _x} AND {getNumber (configfile >> "CfgVehicles" >> typeof _x >> "transportFuel") > 0}};;
+	_refuelSource = objnull;
+	if (GOM_fnc_aircraftLoadout_NeedsFuelSource) then {
 
 	if (_refuelVehs isEqualTo []) exitWith {systemchat "You have no valid refuelling sources!"};
 	_notBusy = _refuelVehs select {!(_x getVariable ["GOM_fnc_aircraftLoadoutBusyFuelSource",false])};
 	if (_notBusy isEqualTo []) exitWith {systemchat "All refuelling sources are currently busy!"};
 	_refuelSource = _notBusy select 0;
 	_refuelSource setVariable ["GOM_fnc_aircraftLoadoutBusyFuelSource",true,true];
+};
 	_vehicles = _obj getVariable ["GOM_fnc_setPylonLoadoutVehicles",[]];
 	_veh = _vehicles select lbcursel 1500;
 
@@ -523,6 +554,8 @@ GOM_fnc_setPylonsRefuel = {
 		if (_curFuel isEqualTo 1) exitWith {systemchat "Aircraft is already at 100% fuel capacity!"};
 		_maxFuel = getNumber (configfile >> "CfgVehicles" >> typeof _veh >> "fuelCapacity");
 		_sourceDispname = getText (configfile >> "CfgVehicles" >> typeof _refuelSource >> "displayName");
+			if (!GOM_fnc_aircraftLoadout_NeedsFuelSource) then {_sourceDispname = selectRandom ["love and light","the love of friendship","a wondrous device","gimlis magic barrel"]};
+
 		_vehDispName = getText (configfile >> "CfgVehicles" >> typeof _veh >> "displayName");
 		_fuel = round(_curFuel * _maxfuel);
 
@@ -553,7 +586,6 @@ GOM_fnc_setPylonsRefuel = {
 			_update = [_obj] call GOM_fnc_updateDialog;
 
 		};
-
 	_refuelSource setVariable ["GOM_fnc_aircraftLoadoutBusyFuelSource",false,true];
 	_veh setfuel 1;
 		playSound "Click";
@@ -606,7 +638,7 @@ GOM_fnc_fillPylonsLB = {
 		lbsetData [1502,_foreachIndex,_x];
 
 	} forEach _validPylonMags;
-
+true
 };
 
 GOM_fnc_pylonCam = {
@@ -614,7 +646,7 @@ GOM_fnc_pylonCam = {
 	params ["_obj"];
 	_vehicles = _obj getVariable ["GOM_fnc_setPylonLoadoutVehicles",[]];
 	_veh = _vehicles select lbcursel 1500;
-
+true
 };
 
 GOM_fnc_pylonSound = {
@@ -628,7 +660,7 @@ GOM_fnc_pylonSound = {
 	playSound3D [_path,_veh,false,_pos,random [0.8,1,1.2],random [0.8,1,1.2],180];
 	//[_obj,_rndSound] remoteExec ["say",0];
 
-
+true
 };
 
 GOM_fnc_CheckComponents = {
@@ -663,7 +695,7 @@ GOM_fnc_CheckComponents = {
 
 	};
 	playSound "Click";
-
+true
 };
 
 GOM_fnc_setPylonOwner = {
@@ -689,7 +721,7 @@ GOM_fnc_setPylonOwner = {
 
 	_veh setVariable ["GOM_fnc_aircraftLoadoutPylonOwner",_pylonOwner,true];
 	_update = [_obj] call GOM_fnc_updateDialog;
-
+true
 };
 
 GOM_fnc_aircraftLoadoutPaintjob = {
@@ -725,7 +757,7 @@ GOM_fnc_aircraftLoadoutPaintjob = {
 	playSound "Click";
 };
 
-
+true
 };
 
 
@@ -785,7 +817,7 @@ GOM_fnc_updatePresetLB = {
 		lbAdd [2101,_x select 1];
 
 	} forEach _validPresets;
-
+true
 };
 
 GOM_fnc_aircraftLoadoutSavePreset = {
@@ -831,7 +863,7 @@ GOM_fnc_aircraftLoadoutDeletePreset = {
 
 	Systemchat format ["Deleting %1 preset: %2",_vehDispName,str (_todelete select 0 select 1)];
 	_updateLB = [_obj] call GOM_fnc_updatePresetLB;
-
+	true
 };
 
 GOM_fnc_aircraftLoadoutLoadPreset = {
@@ -927,4 +959,5 @@ GOM_fnc_aircraftLoadout = {
 
 	} forEach _dark;
 	_check = [_obj] call GOM_fnc_updateDialog;
+	true
 };

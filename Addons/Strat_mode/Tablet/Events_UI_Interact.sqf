@@ -427,6 +427,23 @@ switch (_action) do {
 			    		((uiNamespace getVariable "cti_dialog_ui_interractions") displayCtrl (511000+_i)) ctrlSetPosition [_base_x+(_offset*_base_w),_base_y+5,_base_w,_base_h];
 			    	};
 			    };
+			    case 35: {//Grumpy Old Man Air menu
+		    		if (alive _target  && _target iskindof "Air" ) then  {
+ 			    		_structures = (CTI_P_SideJoined) call CTI_CO_FNC_GetSideStructures;
+ 			    		_ammo_depots = [CTI_AMMO, _structures] call CTI_CO_FNC_GetSideStructuresByType;
+ 			    		_available_ammo_depots = [_target, _ammo_depots, CTI_SERVICE_AMMO_DEPOT_RANGE] call CTI_UI_Service_GetBaseDepots;
+ 			    		if ( locked _target <1 && count (_available_ammo_depots) >0 && local _target ) then {
+ 			    			((uiNamespace getVariable "cti_dialog_ui_interractions") displayCtrl (511000+_i)) ctrlSetTextColor [0,0,1,1];
+ 			    		} else {
+ 			    			((uiNamespace getVariable "cti_dialog_ui_interractions") displayCtrl (511000+_i)) ctrlSetTextColor [0.3,0.3,0.3,1];
+ 			    		};
+
+ 			    		((uiNamespace getVariable "cti_dialog_ui_interractions") displayCtrl (511000+_i)) ctrlSetPosition [_base_x+(_offset*_base_w),_base_y+_h_offset*_base_h,_base_w,_base_h];
+ 			    		_offset=_offset+1;
+ 			    	} else {
+ 			    		((uiNamespace getVariable "cti_dialog_ui_interractions") displayCtrl (511000+_i)) ctrlSetPosition [_base_x+(_offset*_base_w),_base_y+5,_base_w,_base_h];
+ 			    	};
+			    };
 
 			};
 		};
@@ -633,6 +650,11 @@ switch (_action) do {
 		profileNamespace setVariable ["HUD_Tactical", !((profileNamespace getVariable ["HUD_Tactical",true]))];
 		saveProfileNamespace;
 		['onLoad'] call compile preprocessFileLineNumbers 'Addons\Strat_mode\Tablet\Events_UI_Interact.sqf'
+	};
+	case "OnAirmenu": {
+		closedialog 0;
+		player setVariable ["GOM_fnc_setPylonLoadoutVehicles",[_target]];
+		[_target] call GOM_fnc_aircraftLoadout;
 	};
 	case "OnExitT": {
 		TUTO_COMPLETE=true;

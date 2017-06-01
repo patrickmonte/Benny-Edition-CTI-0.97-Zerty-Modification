@@ -283,6 +283,13 @@ class CTI_RscInteraction {
 			action = "['OnDisDef'] call compile preprocessFileLineNumbers 'Addons\Strat_mode\Tablet\Events_UI_Interact.sqf'";
 			toolTip=$STR_Icon_DisDef;
 		};
+		class CTI_Icon_Airmenu : CTI_Icon_fpk {
+			idc = 511035;
+			x = "SafeZoneX + SafeZoneW*0.55";
+			text = "Rsc\Pictures\icon_al.paa";
+			action = "['OnAirmenu'] call compile preprocessFileLineNumbers 'Addons\Strat_mode\Tablet\Events_UI_Interact.sqf'";
+			toolTip=$STR_Icon_Airmenu;
+		};
 	};
 };
 
