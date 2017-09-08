@@ -110,9 +110,30 @@ if (_defense emptyPositions "gunner" > 0) then { //--- Hard defense
 	[_defense, CTI_BASE_DEFENSES_EMPTY_TIMEOUT] spawn CTI_SE_FNC_HandleEmptyVehicle; //--- Track the defense lifespan
 
 	//--- The defense is eligible for auto manning
-	if (_manned && CTI_BASE_DEFENSES_AUTO_LIMIT > 0) then {_defense setVariable ["cti_aman_enabled", true]};
+	if (_manned && CTI_BASE_DEFENSES_AUTO_LIMIT > 0 && !(_defense isKindOf "AAA_System_01_base_F" || _defense isKindOf "SAM_System_01_base_F"|| _defense isKindOf "SAM_System_02_base_F")) then {_defense setVariable ["cti_aman_enabled", true]};
 
+	// --- Zerty edit
+	if (_defense isKindOf "AAA_System_01_base_F" || _defense isKindOf "SAM_System_01_base_F"|| _defense isKindOf "SAM_System_02_base_F") then {
+		_logic = (_side) call CTI_CO_FNC_GetSideLogic;
+		_defense_team = _logic getVariable "cti_defensive_team";
+		switch (_side) do
+		{
+			case EAST:
+			{
+				_ai= _defense_team createUnit ["O_UAV_AI", Position _defense, [], 0, "NONE"];
+				diag_log format["%1",_ai];
+				_ai moveInTurret [_defense,[0]];
+			};
 
+			case WEST:
+			{
+				_ai= ["B_UAV_AI", _defense_team, getpos _defense, WEST] call CTI_CO_FNC_CreateUnit;
+				diag_log format["%1",_ai];
+				_ai moveInGunner _defense;
+			};
+		};
+
+	};
 
 };
 

@@ -193,11 +193,72 @@ _prices = [];
 _placements = [];
 _categories = [];
 
-_headers = _headers 		+ ["Lamp"];
-_classes = _classes 		+ ["Land_LampHalogen_F"];
-_prices = _prices 			+ [5];
-_placements = _placements 	+ [[90, 15]];
-_categories = _categories 	+ ["Fortification"];
+//-----------------------------------------------------------------------------------
+
+
+
+if ((missionNamespace getVariable "CTI_RESPAWN_FOB_RANGE")> 0) then {
+	_headers = _headers 		+ [["FOB",[["RuinOnDestroyed", "Land_Medevac_house_V1_ruins_F"], ["FOB"],["Condition", {_cpt = if (isNil {CTI_P_SideLogic getVariable "cti_fobs"}) then {1000} else {count (CTI_P_SideLogic getVariable "cti_fobs")}; (_cpt < CTI_BASE_FOB_MAX) && (call CTI_CL_FNC_IsPlayerCommander || (!(call CTI_CL_FNC_IsPlayerCommander) && CTI_P_TeamsRequests_FOB > 0)|| ( missionNamespace getVariable 'CTI_BASE_FOB_PERMISSION' ) == 0 )}]]]];
+	_classes = _classes 		+ ["Land_Medevac_house_V1_F"];
+	_prices = _prices 			+ [3000];
+	_placements = _placements 	+ [[180, 15]];
+	_categories = _categories 	+ ["Fortification"];
+};
+
+_headers = _headers 		+ ["MG Defense"];
+_classes = _classes 		+ ["B_HMG_01_High_F"];
+_prices = _prices 			+ [200];
+_placements = _placements 	+ [[180, 5]];
+_categories = _categories 	+ ["Defense"];
+
+_headers = _headers 		+ ["GL Defense"];
+_classes = _classes 		+ ["B_GMG_01_high_F"];
+_prices = _prices 			+ [350];
+_placements = _placements 	+ [[180, 5]];
+_categories = _categories 	+ ["Defense"];
+
+_headers = _headers 		+ ["AT Defense"];
+_classes = _classes 		+ ["B_static_AT_F"];
+_prices = _prices 			+ [900];
+_placements = _placements 	+ [[180, 5]];
+_categories = _categories 	+ ["Defense"];
+
+_headers = _headers 		+ ["AA Defense"];
+_classes = _classes 		+ ["B_static_AA_F"];
+_prices = _prices 			+ [800];
+_placements = _placements 	+ [[180, 5]];
+_categories = _categories 	+ ["Defense"];
+if !(MADE_FOR_STRATIS) then {
+_headers = _headers 		+ ["Mortar"];
+_classes = _classes 		+ ["B_Mortar_01_F"];
+_prices = _prices 			+ [3000];
+_placements = _placements 	+ [[180, 5]];
+_categories = _categories 	+ ["Defense"];
+};
+
+
+_headers = _headers 		+ ["Praetorian 1C"];
+_classes = _classes 		+ ["B_AAA_System_01_F"];
+_prices = _prices 			+ [5000];
+_placements = _placements 	+ [[180, 5]];
+_categories = _categories 	+ ["Defense"];
+
+_headers = _headers 		+ ["Mk49 Spartan"];
+_classes = _classes 		+ ["B_SAM_System_01_F"];
+_prices = _prices 			+ [5000];
+_placements = _placements 	+ [[180, 5]];
+_categories = _categories 	+ ["Defense"];
+
+_headers = _headers 		+ ["Mk21 Centurion"];
+_classes = _classes 		+ ["B_SAM_System_02_F"];
+_prices = _prices 			+ [5000];
+_placements = _placements 	+ [[180, 5]];
+_categories = _categories 	+ ["Defense"];
+
+
+//-----------------------------------------------------------------------------------
+
+
 
 _headers = _headers 		+ ["Empty Crate"];
 _classes = _classes 		+ ["B_supplyCrate_F"];
@@ -296,43 +357,7 @@ _classes = _classes 		+ ["Land_HBarrierTower_F"];
 _prices = _prices 			+ [40];
 _placements = _placements 	+ [[0, 7]];
 
-if ((missionNamespace getVariable "CTI_RESPAWN_FOB_RANGE")> 0) then {
-	_headers = _headers 		+ [["FOB",[["RuinOnDestroyed", "Land_Medevac_house_V1_ruins_F"], ["FOB"],["Condition", {_cpt = if (isNil {CTI_P_SideLogic getVariable "cti_fobs"}) then {1000} else {count (CTI_P_SideLogic getVariable "cti_fobs")}; (_cpt < CTI_BASE_FOB_MAX) && (call CTI_CL_FNC_IsPlayerCommander || (!(call CTI_CL_FNC_IsPlayerCommander) && CTI_P_TeamsRequests_FOB > 0)|| ( missionNamespace getVariable 'CTI_BASE_FOB_PERMISSION' ) == 0 )}]]]];
-	_classes = _classes 		+ ["Land_Medevac_house_V1_F"];
-	_prices = _prices 			+ [3000];
-	_placements = _placements 	+ [[180, 15]];
-	_categories = _categories 	+ ["Fortification"];
-};
-_headers = _headers 		+ ["MG Defense"];
-_classes = _classes 		+ ["B_HMG_01_High_F"];
-_prices = _prices 			+ [200];
-_placements = _placements 	+ [[180, 5]];
-_categories = _categories 	+ ["Defense"];
 
-_headers = _headers 		+ ["GL Defense"];
-_classes = _classes 		+ ["B_GMG_01_high_F"];
-_prices = _prices 			+ [350];
-_placements = _placements 	+ [[180, 5]];
-_categories = _categories 	+ ["Defense"];
-
-_headers = _headers 		+ ["AT Defense"];
-_classes = _classes 		+ ["B_static_AT_F"];
-_prices = _prices 			+ [900];
-_placements = _placements 	+ [[180, 5]];
-_categories = _categories 	+ ["Defense"];
-
-_headers = _headers 		+ ["AA Defense"];
-_classes = _classes 		+ ["B_static_AA_F"];
-_prices = _prices 			+ [800];
-_placements = _placements 	+ [[180, 5]];
-_categories = _categories 	+ ["Defense"];
-if !(MADE_FOR_STRATIS) then {
-_headers = _headers 		+ ["Mortar"];
-_classes = _classes 		+ ["B_Mortar_01_F"];
-_prices = _prices 			+ [3000];
-_placements = _placements 	+ [[180, 5]];
-_categories = _categories 	+ ["Defense"];
-};
 
 _headers = _headers 		+ ["Camo net"];
 _classes = _classes 		+ ["CamoNet_BLUFOR_F"];
@@ -512,6 +537,12 @@ _prices = _prices 			+ [1];
 _placements = _placements 	+ [[0, 5]];
 _categories = _categories 	+ ["Fortification"];
 
+_headers = _headers 		+ ["Lamp"];
+_classes = _classes 		+ ["Land_LampHalogen_F"];
+_prices = _prices 			+ [5];
+_placements = _placements 	+ [[90, 15]];
+_categories = _categories 	+ ["Fortification"];
+
 
 _headers = _headers 		+ ["Lamp Airport"];
 _classes = _classes 		+ ["Land_LampAirport_F"];
@@ -553,7 +584,6 @@ _classes = _classes 		+ ["Land_LampStreet_F"];
 _prices = _prices 			+ [1];
 _placements = _placements 	+ [[0, 10]];
 _categories = _categories 	+ ["Fortification"];
-
 
 
 
